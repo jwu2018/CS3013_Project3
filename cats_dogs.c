@@ -8,6 +8,7 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <semaphore.h>
+#include "cats_dogs.h"
 
 // #include "common.h"
 // #include "common_threads.h"
@@ -80,20 +81,20 @@ int do_get() {
 void *producer(void *arg) {
     int i;
     for (i = 0; i < loops; i++) {
-	sem_wait(&empty);
-	sem_wait(&mutex);
+	Sem_wait(&empty);
+	Sem_wait(&mutex);
 	do_fill(i);
-	sem_post(&mutex);
-	sem_post(&full);
+	Sem_post(&mutex);
+	Sem_post(&full);
     }
 
     // end case
     for (i = 0; i < consumers; i++) {
-	sem_wait(&empty);
-	sem_wait(&mutex);
+	Sem_wait(&empty);
+	Sem_wait(&mutex);
 	do_fill(-1);
-	sem_post(&mutex);
-	sem_post(&full);
+	Sem_post(&mutex);
+	Sem_post(&full);
     }
 
     return NULL;
@@ -102,12 +103,12 @@ void *producer(void *arg) {
 void *consumer(void *arg) {
     int tmp = 0;
     while (tmp != -1) {
-		sem_wait(&full);
-		sem_wait(&mutex);
+		Sem_wait(&full);
+		Sem_wait(&mutex);
 		tmp = do_get();
-		sem_post(&mutex);
-		sem_post(&empty);
-		printf("%lld %d\n", (long long int) arg, tmp);
+		Sem_post(&mutex);
+		Sem_post(&empty);
+		// printf("%lld %d\n", (long long int) arg, tmp);
     }
     return NULL;
 }
@@ -129,18 +130,18 @@ int main(int argc, char *argv[]) {
 		buffer[i] = 0;
     }
 
-    sem_init(&empty, 0, max); // max are empty 
-    sem_init(&full, 0, 0);    // 0 are full
-    sem_init(&mutex, 0, 1);   // mutex
+    Sem_init(&empty, max); // max are empty 
+    Sem_init(&full, 0);    // 0 are full
+    Sem_init(&mutex, 1);   // mutex
 
     pthread_t pid, cid[CMAX];
-    pthread_create(&pid, NULL, producer, NULL); 
+    Pthread_create(&pid, NULL, producer, NULL); 
     for (i = 0; i < consumers; i++) {
-		pthread_create(&cid[i], NULL, consumer, (void *) (long long int) i); 
+		Pthread_create(&cid[i], NULL, consumer, (void *) (long long int) i); 
     }
-    pthread_join(pid, NULL); 
+    Pthread_join(pid, NULL); 
     for (i = 0; i < consumers; i++) {
-		pthread_join(cid[i], NULL); 
+		Pthread_join(cid[i], NULL); 
     }
     return 0;
 }
