@@ -6,86 +6,90 @@
 #include <semaphore.h> 
 #include <unistd.h> 
 
-sem_t empty;
-sem_t cats;
-sem_t dogs;
+sem_t empty, cats, dogs;
+int cats_in, dogs_in;
 int totalPets = 0;
 
-
-void* cat(void* arg) { 
+void* cat() { 
 	// char name[20];
 	// pthread_getname_np(*pet, name, 20);
-	printf("in the cat function\n");
 
 	//wait 
-	sem_wait(&empty);
-	sem_wait(&cats); 
-	printf("%lu the cat entered the kitchen\n", pthread_self()); 
-	totalPets++;
+	sem_wait(&cats);
+	cats_in++;
+	if(cats_in==1) sem_wait(&empty);
+	sem_post(&cats);
+	// printf("%s the cat entered the kitchen\n", name); 
+	// totalPets++;
 
 	//critical section 
 	sleep(1); 
-	printf("total num pets = %d\n", totalPets);
+	printf("cats_in = %d\n", cats_in);
+	printf("dogs_in = %d\n", dogs_in);
 	
-	//signal 
-	printf("%lu the cat exited the kitchen\n", pthread_self()); 
-	sem_post(&empty); 
+	//signal
+	// printf("%s the cat just exiting the kitchen\n", name); 
+	sem_wait(&cats);
+	cats_in--;
+	if(cats_in==0) sem_post(&empty);
 	sem_post(&cats);
-	totalPets--;
+	// totalPets--;
 } 
 
-void* dog(void* arg) {
+void* dog() {
 	// char name[20];
 	// pthread_getname_np(pet, name, 20); 
 
-	printf("in the dog function\n");
-
 	//wait 
-	sem_wait(&empty); 
 	sem_wait(&dogs);
-	printf("%lu the dog entered the kitchen\n", pthread_self()); 
-	// printf("%s the dog entered the kitchen\n", name); 
-	totalPets++;
+	dogs_in++;
+	if(dogs_in==1) sem_wait(&empty);
+	sem_post(&dogs);
+	// printf("%s the cat entered the kitchen\n", name); 
+	// totalPets++;
 
 	//critical section 
 	sleep(1); 
-	printf("total num pets = %d\n", totalPets);
+	printf("cats_in = %d\n", cats_in);
+	printf("dogs_in = %d\n", dogs_in);
 	
-	//signal
-	// printf("%s the dog just exited the kitchen\n", name); 
-	printf("%lu the dog exited the kitchen\n", pthread_self()); 
-	sem_post(&empty); 
+
+	//signal 
+	// printf("%s the cat just exiting the kitchen\n", name); 
+	sem_wait(&dogs);
+	dogs_in--;
+	if(dogs_in==0) sem_post(&empty);
 	sem_post(&dogs);
-	totalPets--;
+	// totalPets--;
 } 
 
 
 int main()  { 
 	sem_init(&empty, 0, 1); 
-	sem_init(&cats, 0, 2);
-	sem_init(&dogs, 0, 2);
+	sem_init(&cats, 0, 1);
+	sem_init(&dogs, 0, 1);
+	cats_in = 0;
+	dogs_in = 0;
 	// make list of empty threads
 	pthread_t pets[22];
 	// make list of thread names ex. Loki
-	char names[22][15] = {"Abby", "Bob", "Carl", "Doggo", "Egg", "Frederickson", "Goat",
-		"Harold", "Igloo", "Jerfy", "Kiki", "Lemon", "Maddy", "Nom", "Oprah", "Pineapple",
-		"Queen", "Rice", "Spam", "Tom", "Unix", "Void"};
+	// char names[22][15] = {"Abby", "Bob", "Carl", "Doggo", "Egg", "Frederickson", "Goat",
+	// 	"Harold", "Igloo", "Jerfy", "Kiki", "Lemon", "Maddy", "Nom", "Oprah", "Pineapple",
+	// 	"Queen", "Rice", "Spam", "Tom", "Unix", "Void"};
 	// pthread_t t1,t2; 
 
 	// cats loop
 	int i = 0;
 	for (; i < 13; i++) {
 		// create thread starting at cat
-		pthread_create(&(pets[i]),NULL,(void*) &cats, NULL); 
-		printf("created cat %d\n", i);
+		pthread_create(&(pets[i]),NULL,(void*) &cat,NULL); 
 		// pthread_setname_np(pets[i], names[i]);
 	}
 
 	// dogs loop
 	for (; i < 22; i++) {
 		// create thread starting at dog
-		pthread_create(&(pets[i]),NULL, (void*) &dog, NULL);
-		printf("created dog %d\n", i); 
+		pthread_create(&(pets[i]),NULL, (void*) &dog,NULL); 
 		// pthread_setname_np(pets[i], names[i]);
 	}
 	// pthread_create(&t1,NULL,thread,NULL); 
