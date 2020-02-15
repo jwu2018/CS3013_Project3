@@ -1,12 +1,19 @@
-CC=gcc
+C     := gcc
+LIBS += -pthread
 
-all: cats_dogs
+SRCS   := cats_dogs.c \
 
-cats_dogs: cats_dogs.o
-	$(CC) -o $@ $^
+OBJS   := ${SRCS:c=o}
+PROGS  := ${SRCS:.c=}
 
-cats_dogs.o: cats_dogs.c
-	$(CC) -c $^ -lpthread -lrt
+.PHONY: all
+all: ${PROGS}
+
+${PROGS} : % : %.o Makefile
+	${CC} $< -o $@ ${LIBS}
 
 clean:
-	rm cats_dogs.o cats_dogs
+	rm -f ${PROGS} ${OBJS}
+
+%.o: %.c Makefile
+	${CC} ${CFLAGS} -c $<
