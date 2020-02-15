@@ -12,14 +12,15 @@ sem_t dogs;
 int totalPets = 0;
 
 
-void* cat(pthread_t* pet) { 
-	char name[20];
-	pthread_getname_np(*pet, name, 20);
+void* cat(void* arg) { 
+	// char name[20];
+	// pthread_getname_np(*pet, name, 20);
+	printf("in the cat function\n");
 
 	//wait 
 	sem_wait(&empty);
 	sem_wait(&cats); 
-	printf("%s the cat entered the kitchen\n", name); 
+	printf("%lu the cat entered the kitchen\n", pthread_self()); 
 	totalPets++;
 
 	//critical section 
@@ -27,20 +28,23 @@ void* cat(pthread_t* pet) {
 	printf("total num pets = %d\n", totalPets);
 	
 	//signal 
-	printf("%s the cat just exiting the kitchen\n", name); 
+	printf("%lu the cat exited the kitchen\n", pthread_self()); 
 	sem_post(&empty); 
 	sem_post(&cats);
 	totalPets--;
 } 
 
-void* dog(pthread_t* pet) {
-	char name[20];
-	pthread_getname_np(pet, name, 20); 
+void* dog(void* arg) {
+	// char name[20];
+	// pthread_getname_np(pet, name, 20); 
+
+	printf("in the dog function\n");
 
 	//wait 
 	sem_wait(&empty); 
 	sem_wait(&dogs);
-	printf("%s the dog entered the kitchen\n", name); 
+	printf("%lu the dog entered the kitchen\n", pthread_self()); 
+	// printf("%s the dog entered the kitchen\n", name); 
 	totalPets++;
 
 	//critical section 
@@ -48,7 +52,8 @@ void* dog(pthread_t* pet) {
 	printf("total num pets = %d\n", totalPets);
 	
 	//signal
-	printf("%s the dog just exiting the kitchen\n", name); 
+	// printf("%s the dog just exited the kitchen\n", name); 
+	printf("%lu the dog exited the kitchen\n", pthread_self()); 
 	sem_post(&empty); 
 	sem_post(&dogs);
 	totalPets--;
@@ -60,7 +65,7 @@ int main()  {
 	sem_init(&cats, 0, 2);
 	sem_init(&dogs, 0, 2);
 	// make list of empty threads
-	pthread_t pets [22];
+	pthread_t pets[22];
 	// make list of thread names ex. Loki
 	char names[22][15] = {"Abby", "Bob", "Carl", "Doggo", "Egg", "Frederickson", "Goat",
 		"Harold", "Igloo", "Jerfy", "Kiki", "Lemon", "Maddy", "Nom", "Oprah", "Pineapple",
@@ -71,19 +76,22 @@ int main()  {
 	int i = 0;
 	for (; i < 13; i++) {
 		// create thread starting at cat
-		pthread_create(&(pets[i]),NULL,(void*) &cats,&pets[i]); 
-		pthread_setname_np(pets[i], names[i]);
+		pthread_create(&(pets[i]),NULL,(void*) &cats, NULL); 
+		printf("created cat %d\n", i);
+		// pthread_setname_np(pets[i], names[i]);
 	}
 
 	// dogs loop
 	for (; i < 22; i++) {
 		// create thread starting at dog
-		pthread_create(&(pets[i]),NULL, (void*) &dog,&pets[i]); 
-		pthread_setname_np(pets[i], names[i]);
+		pthread_create(&(pets[i]),NULL, (void*) &dog, NULL);
+		printf("created dog %d\n", i); 
+		// pthread_setname_np(pets[i], names[i]);
 	}
 	// pthread_create(&t1,NULL,thread,NULL); 
 	// sleep(2); 
 	// pthread_create(&t2,NULL,thread,NULL); 
+	printf("attempting to join threads\n");
 	i = 0;
 	for (; i < 22; i++) {
 		pthread_join(pets[i],NULL); 	
