@@ -6,7 +6,7 @@
 #include <semaphore.h> 
 #include <unistd.h> 
 
-sem_t empty, cats, dogs, cats_max, dogs_max;
+sem_t empty, waiting, cats, dogs, cats_max, dogs_max;
 int cats_in, dogs_in, cats_drinking, dogs_drinking;
 int totalPets = 0;
 
@@ -70,7 +70,8 @@ void* dog() {
 
 
 int main()  { 
-	sem_init(&empty, 0, 1); 
+	sem_init(&empty, 0, 1);
+	sem_init(&waiting, 0, 0); 
 	sem_init(&cats, 0, 1);
 	sem_init(&dogs, 0, 1);
 	sem_init(&cats_max, 0, 2);
