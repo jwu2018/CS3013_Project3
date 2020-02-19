@@ -18,8 +18,9 @@ struct args {
 
 void* cat(void* input) { 
 	struct args* this_cat = (struct args*) input;
-	int time_drinking = 0;
-	// printf("is cat %d\n", this_cat->id);
+	int time_drinking = (rand() % 5) + 1;
+	printf("start: is cat %s\n", this_cat->name);
+	printf("%s wants to drink for %d secs\n\n", this_cat->name, time_drinking);
 	// int* sem_val = (int*) malloc(5);
 	
 	// char name[20];
@@ -39,14 +40,14 @@ void* cat(void* input) {
 	sem_wait(&cats_max);
 	cats_drinking++;
 	//critical section 
-	time_drinking = (rand() % 5) + 1;
 	// printf("time_drinking = %d\n", time_drinking);
 	sleep(time_drinking); 
 	// sem_getvalue(&cats, sem_val);
 	// printf("cats = %d\n", *sem_val);
 	// sem_getvalue(&dogs, sem_val);
 	// printf("dogs = %d\n", *sem_val);
-	printf("is cat %d\n", this_cat->id);
+	printf("time_drinking = %d\n", time_drinking);
+	printf("is cat %s\n", this_cat->name);
 	printf("cats_in = %d\n", cats_in);
 	printf("dogs_in = %d\n", dogs_in);
 	printf("cats_drinking = %d\n", cats_drinking);
@@ -65,8 +66,9 @@ void* cat(void* input) {
 
 void* dog(void* input) {
 	struct args* this_dog = (struct args*) input;
-	int time_drinking = 0;
-	// printf("is dog\n");
+	int time_drinking = (rand() % 5) + 1;
+	printf("start: is dog %s\n", this_dog->name);
+	printf("%s wants to drink for %d secs\n\n", this_dog->name, time_drinking);
 	
 	// char name[20];
 	// pthread_getname_np(pet, name, 20); 
@@ -84,10 +86,9 @@ void* dog(void* input) {
 	sem_wait(&dogs_max);
 	dogs_drinking++;
 	//critical section 
-	time_drinking = (rand() % 5) + 1;
-	// printf("time_drinking = %d\n", time_drinking);
+	printf("time_drinking = %d\n", time_drinking);
 	sleep(time_drinking); 
-	printf("is dog %d\n", this_dog->id);
+	printf("is dog %s\n", this_dog->name);
 	printf("cats_in = %d\n", cats_in);
 	printf("dogs_in = %d\n", dogs_in);
 	printf("cats_drinking = %d\n", cats_drinking);
@@ -121,9 +122,9 @@ int main()  {
 	// make list of empty threads
 	pthread_t pets[22];
 	// make list of thread names ex. Loki
-	// char names[22][15] = {"Abby", "Bob", "Carl", "Doggo", "Egg", "Frederickson", "Goat",
-	// 	"Harold", "Igloo", "Jerfy", "Kiki", "Lemon", "Maddy", "Nom", "Oprah", "Pineapple",
-	// 	"Queen", "Rice", "Spam", "Tom", "Unix", "Void"};
+	char names[22][15] = {"Abby", "Bob", "Carl", "Doggo", "Egg", "Fredrickson", "Goat",
+		"Harold", "Igloo", "Jerfy", "Kiki", "Lemon", "Maddy", "Nom", "Oprah", "Pineapple",
+		"Queen", "Rice", "Spam", "Tom", "Unix", "Void"};
 	// pthread_t t1,t2; 
 
 
@@ -141,7 +142,8 @@ int main()  {
 		printf("this is pet number %d\n", i+1);
 		struct args *Pet = (struct args *)malloc(sizeof(struct args));
 		Pet->id = i;
-		Pet->name = "";
+		Pet->name = names[i];
+		printf("the name of the pet is %s\n", Pet->name);
 
 		if (num_cats == 0) {
 			printf("no more cats, creating dog %d\n", 4 - num_dogs);
