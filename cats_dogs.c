@@ -17,15 +17,19 @@ void* cat() {
 	//wait 
 	sem_wait(&cats);
 	cats_in++;
-	if(cats_in==1) sem_wait(&empty);
+	if(cats_in>=1) {
+		printf("cat waiting for kitchen to be empty\n");
+		sem_wait(&empty);
+	}
 	sem_post(&cats);
 	// printf("%s the cat entered the kitchen\n", name); 
 	// totalPets++;
 
 	//critical section 
 	sleep(1); 
-	printf("cats_in = %d\n", cats_in);
-	printf("dogs_in = %d\n", dogs_in);
+	printf("CAT\n");
+	printf("\tcats_in = %d\n", cats_in);
+	printf("\tdogs_in = %d\n", dogs_in);
 	
 	//signal
 	// printf("%s the cat just exiting the kitchen\n", name); 
@@ -43,7 +47,10 @@ void* dog() {
 	//wait 
 	sem_wait(&dogs);
 	dogs_in++;
-	if(dogs_in==1) sem_wait(&empty);
+	if(dogs_in>=1) {
+		printf("dog waiting for kitchen to be empty\n");
+		sem_wait(&empty);
+	}
 	sem_post(&dogs);
 	// printf("%s the cat entered the kitchen\n", name); 
 	// totalPets++;
