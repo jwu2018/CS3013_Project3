@@ -136,8 +136,8 @@ int main()  {
 
 	// random loop
 	int i = 0;
-	int num_cats = 4;//13;
-	int num_dogs = 3;//9;
+	int num_cats = 21;//13;
+	int num_dogs = 1;//9;
 	int total_pets = num_cats + num_dogs;
 	int random_num = 0;
 	time_t t;
@@ -195,7 +195,7 @@ int main()  {
 	// pthread_create(&t2,NULL,thread,NULL); 
 	printf("attempting to join threads\n");
 	i = 0;
-	for (; i < 22; i++) {
+	for (; i < total_pets; i++) {
 		pthread_join(pets[i],NULL); 	
 	}
 	// pthread_join(t1,NULL); 
