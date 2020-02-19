@@ -6,8 +6,8 @@
 #include <semaphore.h> 
 #include <unistd.h> 
 
-sem_t empty, cats, dogs;
-int cats_in, dogs_in;
+sem_t empty, cats, dogs, cats_max, dogs_max;
+int cats_in, dogs_in, cats_drinking, dogs_drinking;
 int totalPets = 0;
 
 void* cat() { 
@@ -24,13 +24,15 @@ void* cat() {
 	sem_post(&cats);
 	// printf("%s the cat entered the kitchen\n", name); 
 	// totalPets++;
-
+	sem_wait(&cats_max);
+	cats_drinking++;
 	//critical section 
 	sleep(1); 
-	printf("CAT\n");
-	printf("\tcats_in = %d\n", cats_in);
-	printf("\tdogs_in = %d\n", dogs_in);
+	printf("cats_drinking = %d\n", cats_drinking);
+	printf("dogs_drinking = %d\n\n", dogs_drinking);
 	
+	sem_post(&cats_max);
+	cats_drinking--;
 	//signal
 	// printf("%s the cat just exiting the kitchen\n", name); 
 	sem_wait(&cats);
@@ -54,13 +56,15 @@ void* dog() {
 	sem_post(&dogs);
 	// printf("%s the cat entered the kitchen\n", name); 
 	// totalPets++;
-
+	sem_wait(&dogs_max);
+	dogs_drinking++;
 	//critical section 
 	sleep(1); 
-	printf("cats_in = %d\n", cats_in);
-	printf("dogs_in = %d\n", dogs_in);
+	printf("cats_drinking = %d\n", cats_drinking);
+	printf("dogs_drinking = %d\n\n", dogs_drinking);
 	
-
+	sem_post(&dogs_max);
+	dogs_drinking--;
 	//signal 
 	// printf("%s the cat just exiting the kitchen\n", name); 
 	sem_wait(&dogs);
@@ -75,8 +79,12 @@ int main()  {
 	sem_init(&empty, 0, 1); 
 	sem_init(&cats, 0, 1);
 	sem_init(&dogs, 0, 1);
+	sem_init(&cats_max, 0, 2);
+	sem_init(&dogs_max, 0, 2);
 	cats_in = 0;
 	dogs_in = 0;
+	cats_drinking = 0;
+	dogs_drinking = 0;
 	// make list of empty threads
 	pthread_t pets[22];
 	// make list of thread names ex. Loki
