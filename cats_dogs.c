@@ -7,7 +7,7 @@
 #include <unistd.h> 
 #include <stdlib.h>
 
-sem_t empty, waiting, cats, dogs, cats_max, dogs_max;
+sem_t empty, waiting, cats_lock, dogs_lock, cats_max, dogs_max;
 int cats_in, dogs_in, cats_drinking, dogs_drinking;
 int totalPets = 0;
 
@@ -26,14 +26,17 @@ void* cat(void* input) {
 	// pthread_getname_np(*pet, name, 20);
 
 	//wait 
-	sem_wait(&cats);
+	sem_wait(&waiting);
+	sem_wait(&cats_lock);
 	cats_in++;
 	// printf("cats_in was incremented\n");
 	if(cats_in == 1) {
 		printf("cat waiting for kitchen to be empty\n");
 		sem_wait(&empty);
 	}
-	sem_post(&cats);
+	sem_post(&cats_lock);
+	sem_post(&waiting);
+
 	// printf("%s the cat entered the kitchen\n", name); 
 	// totalPets++;
 	sem_wait(&cats_max);
@@ -56,10 +59,10 @@ void* cat(void* input) {
 	cats_drinking--;
 	//signal
 	// printf("%s the cat just exiting the kitchen\n", name); 
-	sem_wait(&cats);
+	sem_wait(&cats_lock);
 	cats_in--;
 	if(cats_in==0) sem_post(&empty);
-	sem_post(&cats);
+	sem_post(&cats_lock);
 	// totalPets--;
 } 
 
@@ -72,13 +75,15 @@ void* dog(void* input) {
 	// pthread_getname_np(pet, name, 20); 
 
 	//wait 
-	sem_wait(&dogs);
+	sem_wait(&waiting);
+	sem_wait(&dogs_lock);
 	dogs_in++;
 	if(dogs_in == 1) {
 		printf("dog waiting for kitchen to be empty\n");
 		sem_wait(&empty);
 	}
-	sem_post(&dogs);
+	sem_post(&dogs_lock);
+	sem_post(&waiting);
 	// printf("%s the cat entered the kitchen\n", name); 
 	// totalPets++;
 	sem_wait(&dogs_max);
@@ -98,11 +103,11 @@ void* dog(void* input) {
 	// printf("here\n");
 	//signal 
 	// printf("%s the cat just exiting the kitchen\n", name); 
-	sem_wait(&dogs);
+	sem_wait(&dogs_lock);
 	// printf("here 1\n");
 	dogs_in--;
 	if(dogs_in==0) sem_post(&empty);
-	sem_post(&dogs);
+	sem_post(&dogs_lock);
 	// printf("here 2\n");
 	// totalPets--;
 } 
@@ -110,9 +115,9 @@ void* dog(void* input) {
 
 int main()  { 
 	sem_init(&empty, 0, 1);
-	sem_init(&waiting, 0, 0); 
-	sem_init(&cats, 0, 1);
-	sem_init(&dogs, 0, 1);
+	sem_init(&waiting, 0, 1); 
+	sem_init(&cats_lock, 0, 1);
+	sem_init(&dogs_lock, 0, 1);
 	sem_init(&cats_max, 0, 2);
 	sem_init(&dogs_max, 0, 2);
 	cats_in = 0;
@@ -195,8 +200,8 @@ int main()  {
 	// pthread_join(t2,NULL); 
 	printf("here\n");
 	sem_destroy(&empty); 
-	sem_destroy(&cats); 
-	sem_destroy(&dogs); 
+	sem_destroy(&cats_lock); 
+	sem_destroy(&dogs_lock); 
 	sem_destroy(&cats_max);
 	sem_destroy(&dogs_max);
 
