@@ -35,7 +35,8 @@ int* make_ordered_list() {
 	int i = NUM_GRADS - 1;
 	int j = 0;
 	int temp = 0;
-	int* ordered_list = {1, 2, 3, 4};
+	int ordered_list[4] = {1, 2, 3, 4};
+	int *a = ordered_list;
 
 	for (; i > 0; i--) {
 		j = rand() % (i+1);
@@ -43,7 +44,7 @@ int* make_ordered_list() {
 		ordered_list[i] = ordered_list[j];
 		ordered_list[j] = temp;
 	}
-	return ordered_list;
+	return a;
 }
 
 void* thread() {
