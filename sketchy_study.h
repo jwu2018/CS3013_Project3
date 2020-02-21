@@ -3,12 +3,18 @@
 
 int NUM_GRADS = 4;
 
-struct args {
+typedef struct specs {
 	int* ordered_list;
-} args;
+	int current_station;
+	int list_size;
+} specs;
+
+typedef struct grad_args {
+	int creation_num;
+} grad_args;
 
 int main();
-int* make_ordered_list();
-void* thread();
+specs* make_grad_specs();
+void* grad(void* input);
 
 #endif

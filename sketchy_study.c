@@ -8,18 +8,28 @@
 #include <stdlib.h>
 #include "sketchy_study.h"
 
-int main() {
-	struct args* grads_args[NUM_GRADS];
-	pthread_t grads[NUM_GRADS];
+struct specs** all_specs;
 
-    for (int i = 0; i < NUM_GRADS; i++) {
-    	grads_args[i] = (struct args *)malloc(sizeof(struct args));
-    	grads_args[i]->ordered_list = make_ordered_list();
-		pthread_create(&(grads[i]),NULL,(void*) &thread, grads_args[i]); 
-        
+int main() {
+	time_t t;
+	srand((unsigned) time(&t));
+	specs all_specs[NUM_GRADS];
+	pthread_t grads[NUM_GRADS];
+	grad_args* args = (grad_args*) malloc(sizeof(grad_args));
+
+	// initialize all_specs
+	for (int n = 0; n < NUM_GRADS; n++) {
+		all_specs[n] = *((specs*) malloc(sizeof(specs)));
 	}
 
-	// printf("attempting to join threads\n");
+    for (int i = 0; i < NUM_GRADS; i++) {
+    	// grads_args[i] = (args *)malloc(sizeof(args));
+    	// grads_args[i] = make_grad_args();
+    	args->creation_num = i;
+		pthread_create(&(grads[i]),NULL,(void*) &grad, args);
+        
+	}
+	printf("attempting to join threads\n");
 	for (int i = 0; i < NUM_GRADS; i++) {
 		pthread_join(grads[i],NULL); 	
 	}
@@ -28,26 +38,72 @@ int main() {
 }
 
 // Fisher-Yates shuffle algorithm
-int* make_ordered_list() {
-	time_t t;
-	srand((unsigned) time(&t));
-
-	int i = NUM_GRADS - 1;
+specs* make_grad_specs() {
+	// int i = NUM_GRADS - 1;
 	int j = 0;
 	int temp = 0;
-	int ordered_list[4] = {1, 2, 3, 4};
-	int *a = ordered_list;
+	int size = (rand() % 4) + 1;
+	int i = size - 1;
+	// printf("rand = %d", rand());
+	int* list = (int*) malloc(sizeof(int));
+	specs* grad_specs = (specs*) malloc(sizeof(specs));
 
+
+
+	// initialize list
+	for (int z = 0; z < size; z++) {
+		list[z] = z + 1;
+		// printf("%d ", list[z]);
+	}
+	// printf("\n");
+
+	// shuffle list
 	for (; i > 0; i--) {
 		j = rand() % (i+1);
-		temp = ordered_list[i];
-		ordered_list[i] = ordered_list[j];
-		ordered_list[j] = temp;
+		// printf("swapping %d and %d\n", list[j], list[i]);
+		temp = list[i];
+		list[i] = list[j];
+		list[j] = temp;
 	}
-	return a;
+
+	// printf("thread list size: %d\n", size);
+	printf("list: ");
+	for (int i = 0; i < size; i++) {
+		printf("%d ", list[i]);
+	}
+	printf("\n");
+	// printf("done printing list\n");
+
+	grad_specs->ordered_list = list;
+	// printf("list ok\n");
+	grad_specs->current_station = list[0];
+	// printf("station ok\n");
+	grad_specs->list_size = size;
+	// printf("size ok\n");
+	// printf("finished making grad args\n");
+	return grad_specs;
 }
 
-void* thread() {
-	printf("in thread\n");
+void* grad(void* input) {
+	int size;
+	int station;
+	int* list;
+	int num;
+	grad_args* args = (grad_args*) input;
+	specs* grad_specs = (specs *)malloc(sizeof(specs));
 
+	num = args->creation_num;
+	grad_specs = make_grad_specs();
+	// printf("here\n");
+	size = grad_specs->list_size;
+	// printf("here 2\n");
+	list = grad_specs->ordered_list;
+	// printf("here 3\n");
+	*all_specs[num] = *grad_specs;
+	// printf("in thread\n");
+	// printf("list size: %d\n", size);
+	// for (int i = 0; i < size; i++) {
+	// 	printf("%d ", list[i]);
+	// }
+	// printf("\n");
 }
