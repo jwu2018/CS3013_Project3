@@ -16,5 +16,8 @@ typedef struct grad_args {
 int main();
 specs* make_grad_specs();
 void* grad(void* input);
+int isDeadlock(int grad_id);
+int isCrossDeadlock(specs* current, specs* other);
+int isParallelDeadlock(specs* current, specs* other);
 
 #endif
