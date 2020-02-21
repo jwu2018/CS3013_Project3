@@ -99,18 +99,10 @@ void* grad(void* input) {
 	int instr_cnt_max;
 	int station;
 	int* list;
-	int num;
 	grad_args* args = (grad_args*) input;
+	int grad_id = args->creation_num;
 	specs* grad_specs = (specs *)malloc(sizeof(specs));
 
-	num = args->creation_num;
-	grad_specs = make_grad_specs();
-	// printf("here\n");
-	instr_cnt_max = grad_specs->list_size;
-	// printf("here 2\n");
-	list = grad_specs->ordered_list;
-	// printf("here 3\n");
-	*all_specs[num] = *grad_specs;
 	// printf("in thread\n");
 	// printf("list size: %d\n", size);
 	// for (int i = 0; i < size; i++) {
@@ -123,12 +115,22 @@ void* grad(void* input) {
 	int stn_res_sts; //station reservation status
 	int r;
 
+	printf("starting runs\n");
 	for(r=0;r<RUNS;r++){
 		instr_cnt = 0;
+		grad_specs = make_grad_specs();
 		// instr_cnt_max = instr->list_size;
+		// num = args->creation_num;
+		// printf("here\n");
+		instr_cnt_max = grad_specs->list_size;
+		// printf("here 2\n");
+		list = grad_specs->ordered_list;
+		// printf("here 3\n");
+		*all_specs[grad_id] = *grad_specs;
 		
-
+		printf("starting object instruction set\n");
 		while(instr_cnt<instr_cnt_max){
+
 			stn_sts = stn[list[instr_cnt]];
 
 			pthread_mutex_lock(&grad_mutex);
@@ -146,17 +148,17 @@ void* grad(void* input) {
 			}
 			if(instr_cnt+1<instr_cnt_max){
 				stn_res_sts = stn_res[list[instr_cnt+1]];
-				while(stn_sts!=0){
-					if(stn_sts==1) pthread_cond_wait(&stn_1_res, &grad_mutex);
-					else if(stn_sts==2) pthread_cond_wait(&stn_2, &grad_mutex);
-					else if(stn_sts==3) pthread_cond_wait(&stn_3, &grad_mutex);
-					else if(stn_sts==4) pthread_cond_wait(&stn_4, &grad_mutex);
+				while(stn_res_sts!=0){
+					if(stn_res_sts==1) pthread_cond_wait(&stn_1, &grad_mutex);
+					else if(stn_res_sts==2) pthread_cond_wait(&stn_2, &grad_mutex);
+					else if(stn_res_sts==3) pthread_cond_wait(&stn_3, &grad_mutex);
+					else if(stn_res_sts==4) pthread_cond_wait(&stn_4, &grad_mutex);
 				}
-				while(stn_sts!=0){
-					if(stn_sts==1) pthread_cond_wait(&stn_1_res, &grad_mutex);
-					else if(stn_sts==2) pthread_cond_wait(&stn_2_res, &grad_mutex);
-					else if(stn_sts==3) pthread_cond_wait(&stn_3_res, &grad_mutex);
-					else if(stn_sts==4) pthread_cond_wait(&stn_4_res, &grad_mutex);
+				while(stn_res_sts!=0){
+					if(stn_res_sts==1) pthread_cond_wait(&stn_1_res, &grad_mutex);
+					else if(stn_res_sts==2) pthread_cond_wait(&stn_2_res, &grad_mutex);
+					else if(stn_res_sts==3) pthread_cond_wait(&stn_3_res, &grad_mutex);
+					else if(stn_res_sts==4) pthread_cond_wait(&stn_4_res, &grad_mutex);
 				}
 			}
 
@@ -165,6 +167,7 @@ void* grad(void* input) {
 			sleep(1);
 
 			instr_cnt++;
+
 		}
 	}
 }
