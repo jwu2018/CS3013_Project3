@@ -119,7 +119,6 @@ void* grad(void* input) {
 	grad_args* args = (grad_args*) input;
 	int grad_id = args->creation_num;
 	specs* grad_specs = (specs *)malloc(sizeof(specs));
-<<<<<<< HEAD
 	num_rounds = (rand() % 10) + 1;
 	printf("num_rounds = %d\n", num_rounds);
 	// id = args->creation_num;
