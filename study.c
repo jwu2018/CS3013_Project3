@@ -10,10 +10,16 @@ pthread_mutex_t mutex, station1, station2, station3, station4;
 
 int main() {
 	time_t t;
-	srand((unsigned) time(&t));
+	// srand((unsigned) time(&t));
+	srand(time(0));
 	// specs all_specs[NUM_GRADS];
 	pthread_t grads[NUM_GRADS];
 	int total_obj = 0;
+	grad_specs* args[4];
+
+	for (int i = 0; i < 4; i++) {
+		args[i] = (grad_specs*) malloc(sizeof(grad_specs));
+	}
 	
 	char** bob_objects = (char**) malloc(sizeof(char*));
 	char** beef_objects = (char**) malloc(sizeof(char*));
@@ -48,8 +54,7 @@ int main() {
 
     for (int i = 0; i < NUM_GRADS; i++) {
     	int num_obj = (rand() % 5) + 1;
-    	grad_specs* args = (grad_specs*) malloc(sizeof(grad_specs));
-
+   		
 		for (int j = 0; j < num_obj; j++) {
 			// printf("adding object %s to the list for %d\n",objects[total_obj+j], i);
 			if (i == 0) {
@@ -67,31 +72,33 @@ int main() {
 		}
 		total_obj+= (num_obj);
 
-    	args->name = names[i];
-    	args->current_object = 0;
-    	args->num_objects = num_obj;
+    	args[i]->name = names[i];
+    	args[i]->current_object = 0;
+    	args[i]->num_objects = num_obj;
     	if (i == 0) {
-    		args->objects = bob_objects;
+    		args[i]->objects = bob_objects;
     	}
     	else if (i == 1) {
-    		args->objects = beef_objects;
+    		args[i]->objects = beef_objects;
     	}
     	else if (i==2) {
-    		args->objects = bilbo_objects;
+    		args[i]->objects = bilbo_objects;
     	}
     	else {
-    		args->objects = ginger_objects;
+    		args[i]->objects = ginger_objects;
     	}
     	
     	// printf("creation num = %d\n", args->creation_num)
-		pthread_create(&(grads[i]),NULL,(void*) &grad, args);
-		// free(args);
+		pthread_create(&(grads[i]),NULL,(void*) &grad, args[i]);
+		
 	}
 	printf("attempting to join threads\n");
 	for (int i = 0; i < NUM_GRADS; i++) {
 		pthread_join(grads[i],NULL);	
 	}
-
+	// for (int i = 0; i < 4; i++) {
+	// 	free(args[i]);
+	// }
 	return 0;
 }
 
@@ -117,6 +124,9 @@ void* grad(void* input) {
 	printf("Howdy doo I'm %s and I have the %s.\nI need to go to stations ", id, current_obj);
 
 	num_steps = (rand() % 4) + 1;
+	// printf("random: %d\n", num_steps);
+	// num_steps = (num_steps % 4) + 1;
+	// printf("num steps: %d\n", num_steps);
 	// printf("num steps: %d\n", num_steps);
 	list = make_random_list(num_steps);
 	printf("list: ");
@@ -171,10 +181,13 @@ void* grad(void* input) {
 				pthread_mutex_unlock(&station4); 
 			}
 		}
-		printf("I, %s, am discarding the %s ", id, current_obj);
-		specs->current_object = specs->current_object + 1;
-		current_obj = specs->objects[specs->current_object];
-		printf("and have picked the %s as my next victim.\n", current_obj);
+		printf("I, %s, am discarding the %s", id, current_obj);
+		if (i != num_objs - 1) {
+			specs->current_object = specs->current_object + 1;
+			current_obj = specs->objects[specs->current_object];
+			printf(" and have picked the %s as my next victim", current_obj);
+		}
+		printf(".\n");
 	}
 }
 
