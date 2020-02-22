@@ -1,0 +1,57 @@
+attempting to join threads
+Howdy doo I'm Ginger and I have the Laptop.
+I need to go to stations list: 2 1 in that order.
+
+I, Ginger, have total control over station 2.
+I, Ginger, have total control over station 1.
+Howdy doo I'm Bilbo Baggins and I have the Whale.
+I need to go to stations list: 2 1 in that order.
+
+Howdy doo I'm Beef Jerky and I have the Freezer.
+I need to go to stations list: 2 1 in that order.
+
+Howdy doo I'm Bobbigail and I have the Chair.
+I need to go to stations list: 1 in that order.
+
+I, Ginger, am shocking the Laptop at station 2.
+I, Bilbo Baggins, have total control over station 2.
+I, Ginger, am soaking the Laptop at station 1.
+I, Ginger, am discarding the Laptop.
+I, Bilbo Baggins, have total control over station 1.
+I, Bilbo Baggins, am shocking the Whale at station 2.
+I, Beef Jerky, have total control over station 2.
+I, Bilbo Baggins, am soaking the Whale at station 1.
+I, Bilbo Baggins, am discarding the Whale.
+I, Beef Jerky, have total control over station 1.
+I, Beef Jerky, am shocking the Freezer at station 2.
+I, Beef Jerky, am soaking the Freezer at station 1.
+I, Beef Jerky, am discarding the Freezer and have picked the Belt as my next victim.
+I, Bobbigail, have total control over station 1.
+I, Beef Jerky, have total control over station 2.
+I, Bobbigail, am soaking the Chair at station 1.
+I, Bobbigail, am discarding the Chair and have picked the Hand as my next victim.
+I, Beef Jerky, have total control over station 1.
+I, Beef Jerky, am shocking the Belt at station 2.
+I, Beef Jerky, am soaking the Belt at station 1.
+I, Beef Jerky, am discarding the Belt and have picked the Suit as my next victim.
+I, Bobbigail, have total control over station 1.
+I, Beef Jerky, have total control over station 2.
+I, Bobbigail, am soaking the Hand at station 1.
+I, Bobbigail, am discarding the Hand and have picked the Sari as my next victim.
+I, Beef Jerky, have total control over station 1.
+I, Beef Jerky, am shocking the Suit at station 2.
+I, Beef Jerky, am soaking the Suit at station 1.
+I, Beef Jerky, am discarding the Suit and have picked the Chili as my next victim.
+I, Bobbigail, have total control over station 1.
+I, Beef Jerky, have total control over station 2.
+I, Bobbigail, am soaking the Sari at station 1.
+I, Bobbigail, am discarding the Sari.
+I, Beef Jerky, have total control over station 1.
+I, Beef Jerky, am shocking the Chili at station 2.
+I, Beef Jerky, am soaking the Chili at station 1.
+I, Beef Jerky, am discarding the Chili and have picked the Whale as my next victim.
+I, Beef Jerky, have total control over station 2.
+I, Beef Jerky, have total control over station 1.
+I, Beef Jerky, am shocking the Whale at station 2.
+I, Beef Jerky, am soaking the Whale at station 1.
+I, Beef Jerky, am discarding the Whale.

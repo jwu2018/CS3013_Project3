@@ -8,6 +8,13 @@ pthread_mutex_t mutex, station1, station2, station3, station4;
 
 // list *(*all_lists)[];
 
+/*
+ * Runs the simulation. Four grad students recieve a bucket of
+ * random objects and are given instructions for each one. The
+ * students then go to each station (according to the instructions)
+ * in order. No two students can be at the same station at the
+ * same time.
+ */
 int main() {
 	time_t t;
 	// srand((unsigned) time(&t));
@@ -102,6 +109,12 @@ int main() {
 	return 0;
 }
 
+
+/*
+ * When this is called, a grad student is spurred into motion.
+ * They will check to see if it is safe to start or to
+ * go to the next station, and if it is, they will.
+ */
 void* grad(void* input) {
 	int* list;
 	int num_steps; // number of steps in the list
@@ -191,6 +204,11 @@ void* grad(void* input) {
 	}
 }
 
+/*
+ * Makes an array 1 to num_steps and shuffles the array.
+ * @param num_steps, the number of instructions to include
+ * @return a shuffled array
+ */
 int* make_random_list(int num_steps) {
 	int j = 0;
 	int temp = 0;
