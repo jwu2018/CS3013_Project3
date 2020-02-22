@@ -1,7 +1,7 @@
 C     := gcc
 LIBS += -pthread
 
-SRCS   := cats_dogs.c sketchy_study.c 
+SRCS   := cats_dogs.c sketchy_study.c  study.c
 
 OBJS   := ${SRCS:c=o}
 PROGS  := ${SRCS:.c=}

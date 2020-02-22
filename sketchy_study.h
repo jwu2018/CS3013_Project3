@@ -5,7 +5,7 @@ int NUM_GRADS = 4;
 
 typedef struct specs {
 	int* ordered_list;
-	int current_station;
+	int list_index;
 	int list_size;
 } specs;
 
