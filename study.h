@@ -11,7 +11,9 @@ typedef struct list {
 
 typedef struct grad_specs {
 	char* name;
-	char* object;
+	char** objects;
+	int current_object;
+	int num_objects;
 } grad_specs;
 
 int main();
