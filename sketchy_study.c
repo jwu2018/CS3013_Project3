@@ -103,7 +103,6 @@ specs* make_grad_specs() {
 
 void* grad(void* input) {
 	printf("i'm starting over\n");
-	// int instr_cnt_max;
 	int* list;
 	int num_steps; // number of steps in the list
 	int station_index; // index of station in the list
@@ -146,6 +145,7 @@ void* grad(void* input) {
 	// for (int i = 0; i < size; i++) {
 	// 	printf("%d ", list[i]);
 	int instr_cnt;
+	int instr_cnt_max;
 	int curr_stn_sts;
 	int curr_stn_res_sts;
 	int nxt_stn_sts;
