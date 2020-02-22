@@ -1,0 +1,2 @@
+Problem 2: Synchronizing Shue’s Sketchy Scientific Study
+We approached the second problem by using an essentially "bruteforce" method that ensures that no deadlocks can occur from any test case scenario/combination of object instructions. To start the program, we declare four threads and pass in a struct that contains the name of the thread (the graduate student's name), as well as an array of names for the objects. In the grad student thread, each time the student wants to experiment on an object 
