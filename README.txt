@@ -57,3 +57,7 @@ the program will stop after printing 5-10 lines and show the message:
 
 or something similar to it. If you run ./study again it should work
 and the error message will disappear.
+
+To test this phase, we wrote a bash file. It runs the simulation
+10 times and stores the output in the file study_output.txt. In
+order to run the bash file, use the command "sh test_file.sh".

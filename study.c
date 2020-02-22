@@ -32,25 +32,6 @@ int main() {
 	char** beef_objects = (char**) malloc(sizeof(char*));
 	char** bilbo_objects = (char**) malloc(sizeof(char*));
 	char** ginger_objects = (char**) malloc(sizeof(char*));
-	// grad_args* args = (grad_args*) malloc(sizeof(grad_args));
-	// grad_specs* args = (grad_specs*) malloc(sizeof(grad_specs));
-	// list* dummy[NUM_GRADS];
-	// specs *(*all_specs)[];
-	// all_lists = (list**) malloc(sizeof(list*));
-
-	// initialize stn and stn_res
-	// for (int i = 0; i < NUM_GRADS; i++) {
-	// 	stn[i] = 0;
-	// 	// stn_res[i] = 0;
-	// }
-
-	// initialize all_lists
-	// for (int n = 0; n < NUM_GRADS; n++) {
-	// 	dummy[n] = ((list*) malloc(sizeof(list)));
-	// }
-	// all_lists = &dummy;
-
-	// make grad threads
 
 	char names[4][30] = {"Bobbigail", "Beef Jerky", "Bilbo Baggins", "Ginger"};
 	char objects[20][30] = {"Chair", "Hand", "Sari", "Freezer", "Belt", "Suit",
@@ -118,7 +99,6 @@ int main() {
 void* grad(void* input) {
 	int* list;
 	int num_steps; // number of steps in the list
-	// unsigned long int id; // grad 1, 2, 3, or 4
 	char* id;
 	char* current_obj;
 	int num_objs;
@@ -137,22 +117,12 @@ void* grad(void* input) {
 	printf("Howdy doo I'm %s and I have the %s.\nI need to go to stations ", id, current_obj);
 
 	num_steps = (rand() % 4) + 1;
-	// printf("random: %d\n", num_steps);
-	// num_steps = (num_steps % 4) + 1;
-	// printf("num steps: %d\n", num_steps);
-	// printf("num steps: %d\n", num_steps);
 	list = make_random_list(num_steps);
 	printf("list: ");
 	for (int i = 0; i < num_steps; i++) {
 		printf("%d ", list[i]);
 	}
 	printf("in that order.\n\n");
-
-	// printf("list of objects: ");
-	// for (int i = 0; i <num_objs; i++) {
-	// 	printf("%s ", specs->objects[i]);
-	// }
-	// printf("\n");
 
 	for (int i = 0; i < num_objs; i++) {
 		pthread_mutex_lock(&mutex);

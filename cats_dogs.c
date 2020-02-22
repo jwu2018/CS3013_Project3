@@ -31,12 +31,7 @@ struct args {
 void* cat(void* input) { 
 	struct args* this_cat = (struct args*) input;
 	int time_drinking = (rand() % 5) + 1;
-	// printf("start: is cat %s\n", this_cat->name);
 	printf("%s the cat wants to drink for %d secs.\n", this_cat->name, time_drinking);
-	// int* sem_val = (int*) malloc(5);
-	
-	// char name[20];
-	// pthread_getname_np(*pet, name, 20);
 
 	//wait 
 	sem_wait(&waiting);
@@ -93,11 +88,7 @@ void* cat(void* input) {
 void* dog(void* input) {
 	struct args* this_dog = (struct args*) input;
 	int time_drinking = (rand() % 5) + 1;
-	// printf("start: is dog %s\n", this_dog->name);
 	printf("%s the dog wants to drink for %d secs.\n", this_dog->name, time_drinking);
-	
-	// char name[20];
-	// pthread_getname_np(pet, name, 20); 
 
 	//wait 
 	sem_wait(&waiting);
@@ -125,16 +116,12 @@ void* dog(void* input) {
 	
 	sem_post(&dogs_max);
 	dogs_drinking--;
-	// printf("here\n");
-	//signal 
+	// signal
 	printf("%s the dog just exited the kitchen.\n", this_dog->name); 
 	sem_wait(&dogs_lock);
-	// printf("here 1\n");
 	dogs_in--;
 	if(dogs_in==0) sem_post(&empty);
 	sem_post(&dogs_lock);
-	// printf("here 2\n");
-	// totalPets--;
 } 
 
 /*
@@ -219,9 +206,6 @@ int main()  {
 	for (; i < total_pets; i++) {
 		pthread_join(pets[i],NULL); 	
 	}
-	// pthread_join(t1,NULL); 
-	// pthread_join(t2,NULL); 
-	// printf("here\n");
 	sem_destroy(&empty); 
 	sem_destroy(&cats_lock); 
 	sem_destroy(&dogs_lock); 
