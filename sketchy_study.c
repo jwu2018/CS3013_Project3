@@ -12,14 +12,11 @@
 #define NAME2 2
 #define NAME3 3
 #define NAME4 4
-#define RUNS 5
 
-// represent if the station is taken/reserved:
-// 		0 = empty or unreserved
-//		1,2,3,4 = the id of the grad that is taking/reserving it
-int stn[4];
+int stn[4], stn_res[4];
 
-pthread_cond_t stn_1, stn_2, stn_3, stn_4, stn_1_res, stn_2_res, stn_3_res, stn_4_res;
+//cv to indicate when a station's status is updated
+pthread_cond_t stn_1, stn_2, stn_3, stn_4;
 
 pthread_mutex_t grad_mutex;
 
@@ -120,154 +117,208 @@ void* grad(void* input) {
 	// int r;
 
 	grad_args* args = (grad_args*) input;
+	int grad_id = args->creation_num;
 	specs* grad_specs = (specs *)malloc(sizeof(specs));
-	num_rounds = 1;// (rand() % 10) + 1;
-	id = args->creation_num;
-	// id = pthread_self();
+	num_rounds = (rand() % 10) + 1;
+	printf("num_rounds = %d\n", num_rounds);
+	// id = args->creation_num;
 
-	// printf("num_rounds for grad %d = %d\n", id, num_rounds);
+	// for (int round = 0; round < num_rounds; round++) {
+	// 	// make specs
+	// 	grad_specs = make_grad_specs();
+	// 	num_steps = grad_specs->list_size;
+	// 	list = grad_specs->ordered_list;
+	// 	station = grad_specs->current_station;
+	// 	// update global
+	// 	(*all_specs)[id] = grad_specs;
+	// 	// for each instruction
+	// 	for (int i_index = 0; i_index < num_steps; i_index++) {
 
-	for (int round = 1; round <= num_rounds; round++) { // for each round
-		printf("round: %d\n", round);
-		// make specs
-		printf("making specs for grad %d\n", id);
+	// 		if (isDeadlock) {
+	// 			printf("is deadlock\n");
+	// 		}
+	// 	}
+	// }
+
+
+	// printf("in thread\n");
+	// printf("list size: %d\n", size);
+	// for (int i = 0; i < size; i++) {
+	// 	printf("%d ", list[i]);
+	int instr_cnt;
+	int curr_stn_sts;
+	int curr_stn_res_sts;
+	int nxt_stn_sts;
+	int nxt_stn_res_sts;
+	int r;
+
+	printf("starting runs\n");
+	for(r=0;r<num_rounds;r++){
+		instr_cnt = 0;
 		grad_specs = make_grad_specs();
-		num_steps = grad_specs->list_size;
+		// instr_cnt_max = instr->list_size;
+		// num = args->creation_num;
+		// printf("here\n");
+		instr_cnt_max = grad_specs->list_size;
+		// printf("here 2\n");
 		list = grad_specs->ordered_list;
-		station_index = grad_specs->list_index;
-		station = list[station_index];
-		// update global
-		(*all_specs)[id] = grad_specs;
-		// for each instruction
-		// printf("num_steps = %d\n", num_steps);
-		for (int instr_cnt = 0; instr_cnt < num_steps; instr_cnt++) { // for each instruction
-			printf("grad %d instruct count: %d\n", id, instr_cnt);
+		// printf("here 3\n");
+		*all_specs[grad_id] = *grad_specs;
+		
+		printf("starting object instruction set\n");
+		while(instr_cnt<instr_cnt_max){
 
+			curr_stn = list[instr_cnt];
+			curr_stn_sts = stn[curr_stn];
 
-			printf("stn: ");
-			for (int i = 0; i < 4; i++) {
-				printf("%d ", stn[i]);
+			pthread_mutex_lock(&grad_mutex);
+			if(instr_cnt+1<instr_cnt_max){
+				stn_nxt = list[instr_cnt+1];
+				stn_res_sts = stn_res[stn_next];
+				while(stn_sts stn_res_sts!=0){
+					if(stn_nxt==1) pthread_cond_wait(&stn_1, &grad_mutex);
+					else if(stn_nxt==2) pthread_cond_wait(&stn_2, &grad_mutex);
+					else if(stn_nxt==3) pthread_cond_wait(&stn_3, &grad_mutex);
+					else if(stn_nxt==4) pthread_cond_wait(&stn_4, &grad_mutex);
+				}
 			}
-			printf("\n");
+			while(stn_sts!=0){
+				if(stn_curr==1) pthread_cond_wait(&stn_1, &grad_mutex);
+				else if(stn_curr==2) pthread_cond_wait(&stn_2, &grad_mutex);
+				else if(stn_curr==3) pthread_cond_wait(&stn_3, &grad_mutex);
+				else if(stn_curr==4) pthread_cond_wait(&stn_4, &grad_mutex);
+			}
+
+			pthread_mutex_unlock(&grad_mutex);
+
+			sleep(1);
+
+			instr_cnt++;
+
+		// 	printf("stn: ");
+		// 	for (int i = 0; i < 4; i++) {
+		// 		printf("%d ", stn[i]);
+		// 	}
+		// 	printf("\n");
 
 
-			// reset stn_res_sts
-			// stn_res_sts = 0;
-			while (!stn_res_sts) {
-				if (isDeadlock(id)) {
-					// wait for station cv and signal the next thread
-					printf("is deadlock\n");
-					if(station==1) {
-						pthread_cond_wait(&stn_1, &grad_mutex);
-						// pthread_cond_signal(&stn_1);
-					}
-					else if(station==2) {
-						pthread_cond_wait(&stn_2, &grad_mutex);
-						// pthread_cond_signal(&stn_2);
-					}
-					else if(station==3) {
-						pthread_cond_wait(&stn_3, &grad_mutex);
-						// pthread_cond_signal(&stn_3);
-					}
-					else if(station==4) {
-						pthread_cond_wait(&stn_4, &grad_mutex);
-						// pthread_cond_signal(&stn_4);
-					}
-				}
-				else { // not deadlock
-					// check spot 1 status
-					// printf("checking spot 1 status\n");
-					// printf("stn[%d] = %d\n", station_index, stn[station_index]);
-					if (stn[station_index] == 0 || stn[station_index] == id) { // check station status
-						if (instr_cnt == num_steps - 1) { // last instruction
-							// clear previous from stn
-							if (station_index != 0) {
-								int prev_station = list[station_index - 1];
-								stn[prev_station] = 0;
-							}
-							// printf("last instruction %d == %d\n", instr_cnt, num_steps-1);
-							printf("last instruction\n");
-							printf("grad %d is doing stuff at station %d\n", id, station);
-							// sleep((rand() % 5) + 1);
-							break;
-						}
-						else {
-							// check spot 2 status
-							// printf("checking spot 2 status\n");
-							// printf("stn[%d] = %d\n", station_index+1, stn[station_index+1]);
-							if (stn[station_index + 1] == 0) {
-								// clear previous from stn
-								if (station_index != 0) {
-									int prev_station = list[station_index - 1];
-									stn[prev_station] = 0;
-								}
-								stn[station_index] = id;
-								stn[station_index + 1] = id;
-								stn_res_sts = 1;
-								printf("grad has reserved station %d\n", list[station_index + 1]);
-								printf("grad %d is doing stuff at station %d\n", id, station);
-								// sleep((rand() % 5) + 1);
-								break;
-							} // if
-							else {
-								// wait for reservation cv and signal the next thread
-								printf("spot 1 not free\n");
-								if(station==1) {
-									pthread_cond_wait(&stn_1_res, &grad_mutex);
-									// pthread_cond_signal(&stn_1_res);
-								}
-								else if(station==2) {
-									pthread_cond_wait(&stn_2_res, &grad_mutex);
-									// pthread_cond_signal(&stn_2_res);
-								}
-								else if(station==3) {
-									pthread_cond_wait(&stn_3_res, &grad_mutex);
-									// pthread_cond_signal(&stn_3_res);
-								}
-								else if(station==4) {
-									pthread_cond_wait(&stn_4_res, &grad_mutex);
-									// pthread_cond_signal(&stn_4_res);
-								}
-							} // else
-						} // else
-					} // if
-					else {
-						// wait for station cv and signal the next thread
-						printf("can't reserve\n");
-						if(station==1) {
-							pthread_cond_wait(&stn_1, &grad_mutex);
-							// pthread_cond_signal(&stn_1);
-						}
-						else if(station==2) {
-							pthread_cond_wait(&stn_2, &grad_mutex);
-							// pthread_cond_signal(&stn_2);
-						}
-						else if(station==3) {
-							pthread_cond_wait(&stn_3, &grad_mutex);
-							// pthread_cond_signal(&stn_3);
-						}
-						else if(station==4) {
-							pthread_cond_wait(&stn_4, &grad_mutex);
-							// pthread_cond_signal(&stn_4);
-						}
-					} // else
+		// 	// reset stn_res_sts
+		// 	// stn_res_sts = 0;
+		// 	while (!stn_res_sts) {
+		// 		if (isDeadlock(id)) {
+		// 			// wait for station cv and signal the next thread
+		// 			printf("is deadlock\n");
+		// 			if(station==1) {
+		// 				pthread_cond_wait(&stn_1, &grad_mutex);
+		// 				// pthread_cond_signal(&stn_1);
+		// 			}
+		// 			else if(station==2) {
+		// 				pthread_cond_wait(&stn_2, &grad_mutex);
+		// 				// pthread_cond_signal(&stn_2);
+		// 			}
+		// 			else if(station==3) {
+		// 				pthread_cond_wait(&stn_3, &grad_mutex);
+		// 				// pthread_cond_signal(&stn_3);
+		// 			}
+		// 			else if(station==4) {
+		// 				pthread_cond_wait(&stn_4, &grad_mutex);
+		// 				// pthread_cond_signal(&stn_4);
+		// 			}
+		// 		}
+		// 		else { // not deadlock
+		// 			// check spot 1 status
+		// 			// printf("checking spot 1 status\n");
+		// 			// printf("stn[%d] = %d\n", station_index, stn[station_index]);
+		// 			if (stn[station_index] == 0 || stn[station_index] == id) { // check station status
+		// 				if (instr_cnt == num_steps - 1) { // last instruction
+		// 					// clear previous from stn
+		// 					if (station_index != 0) {
+		// 						int prev_station = list[station_index - 1];
+		// 						stn[prev_station] = 0;
+		// 					}
+		// 					// printf("last instruction %d == %d\n", instr_cnt, num_steps-1);
+		// 					printf("last instruction\n");
+		// 					printf("grad %d is doing stuff at station %d\n", id, station);
+		// 					// sleep((rand() % 5) + 1);
+		// 					break;
+		// 				}
+		// 				else {
+		// 					// check spot 2 status
+		// 					// printf("checking spot 2 status\n");
+		// 					// printf("stn[%d] = %d\n", station_index+1, stn[station_index+1]);
+		// 					if (stn[station_index + 1] == 0) {
+		// 						// clear previous from stn
+		// 						if (station_index != 0) {
+		// 							int prev_station = list[station_index - 1];
+		// 							stn[prev_station] = 0;
+		// 						}
+		// 						stn[station_index] = id;
+		// 						stn[station_index + 1] = id;
+		// 						stn_res_sts = 1;
+		// 						printf("grad has reserved station %d\n", list[station_index + 1]);
+		// 						printf("grad %d is doing stuff at station %d\n", id, station);
+		// 						// sleep((rand() % 5) + 1);
+		// 						break;
+		// 					} // if
+		// 					else {
+		// 						// wait for reservation cv and signal the next thread
+		// 						printf("spot 1 not free\n");
+		// 						if(station==1) {
+		// 							pthread_cond_wait(&stn_1_res, &grad_mutex);
+		// 							// pthread_cond_signal(&stn_1_res);
+		// 						}
+		// 						else if(station==2) {
+		// 							pthread_cond_wait(&stn_2_res, &grad_mutex);
+		// 							// pthread_cond_signal(&stn_2_res);
+		// 						}
+		// 						else if(station==3) {
+		// 							pthread_cond_wait(&stn_3_res, &grad_mutex);
+		// 							// pthread_cond_signal(&stn_3_res);
+		// 						}
+		// 						else if(station==4) {
+		// 							pthread_cond_wait(&stn_4_res, &grad_mutex);
+		// 							// pthread_cond_signal(&stn_4_res);
+		// 						}
+		// 					} // else
+		// 				} // else
+		// 			} // if
+		// 			else {
+		// 				// wait for station cv and signal the next thread
+		// 				printf("can't reserve\n");
+		// 				if(station==1) {
+		// 					pthread_cond_wait(&stn_1, &grad_mutex);
+		// 					// pthread_cond_signal(&stn_1);
+		// 				}
+		// 				else if(station==2) {
+		// 					pthread_cond_wait(&stn_2, &grad_mutex);
+		// 					// pthread_cond_signal(&stn_2);
+		// 				}
+		// 				else if(station==3) {
+		// 					pthread_cond_wait(&stn_3, &grad_mutex);
+		// 					// pthread_cond_signal(&stn_3);
+		// 				}
+		// 				else if(station==4) {
+		// 					pthread_cond_wait(&stn_4, &grad_mutex);
+		// 					// pthread_cond_signal(&stn_4);
+		// 				}
+		// 			} // else
 
-				}
-			} // while stn_res_sts != 1
-			printf("exited while loop\n");
+		// 		}
+		// 	} // while stn_res_sts != 1
+		// 	printf("exited while loop\n");
 
-			// update specs
-			station_index++;
-			station = list[station_index];
-			stn_res_sts = 0;
-			grad_specs->list_index = station_index;
+		// 	// update specs
+		// 	station_index++;
+		// 	station = list[station_index];
+		// 	stn_res_sts = 0;
+		// 	grad_specs->list_index = station_index;
 	
-		} // for each instruction
-		printf("exited loop for all instructions\n");
-		// clear previous from stn
-		if (station_index != 0) {
-			int prev_station = list[station_index - 1];
-			stn[prev_station] = 0;
+		// } // for each instruction
+		// printf("exited loop for all instructions\n");
+		// // clear previous from stn
+		// if (station_index != 0) {
+		// 	int prev_station = list[station_index - 1];
+		// 	stn[prev_station] = 0;
 		}
 	} // for each round
 }
